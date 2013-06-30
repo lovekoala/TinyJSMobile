@@ -271,8 +271,8 @@ public:
 protected:
     int refs; ///< The number of references held to this - used for garbage collection
 
-    void *pData;
-	bool needDestroyed;
+    void *pData; //added by Misa.Z for point type data
+	bool needDestroyed; 
 
     std::string data; ///< The contents of this variable if it is a string
     long intData; ///< The contents of this variable if it is an int
