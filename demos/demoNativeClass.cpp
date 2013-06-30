@@ -21,15 +21,15 @@ class MyClass {
 
   static void test(CScriptVar* var, void *userData) {
     MyNativeClass* cls = (MyNativeClass*)var->getPoint();
-	cls->test();
+    cls->test();
   }
 
 
 public:
   static void registerFunctions(CTinyJS* tinyJS) {
     CScriptVar* cls = new CScriptVar(TINYJS_BLANK_DATA, SCRIPTVAR_OBJECT);
-	cls->setNativeConstructor(constructor, NULL);
-	tinyJS->addClass("MyClass", cls);
+    cls->setNativeConstructor(constructor, NULL);
+    tinyJS->addClass("MyClass", cls);
 
     tinyJS->addNative("function MyClass.test()", test, 0);
   }
@@ -38,11 +38,13 @@ public:
 
 int main(int argc, char** argv) {
 
-  CTinyJS tinyJS;
+  while(true) { //Don't be scared, just for memory test:P.
+    CTinyJS tinyJS;
 
-  MyClass::registerFunctions(&tinyJS);
+    MyClass::registerFunctions(&tinyJS);
 
-  tinyJS.execute("var a = new MyClass(); a.test();");
+    tinyJS.execute("var a = new MyClass(); a.test();");
+  }
 
   return 0;
 }
