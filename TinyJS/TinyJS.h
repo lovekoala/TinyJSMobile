@@ -194,6 +194,7 @@ public:
   void setIntName(int n); ///< Set the name as an integer (for arrays)
 };
 
+typedef void (*JSDestroy)(void *p);
 /// Variable class (containing a doubly-linked list of children)
 class CScriptVar
 {
@@ -203,7 +204,7 @@ public:
     CScriptVar(const std::string &str); ///< Create a string
     CScriptVar(double varData);
     CScriptVar(int val);
-    CScriptVar(void* p, bool needDestroyed);
+    CScriptVar(void* p, JSDestroy destroy, bool needDestroyed);
 
     ~CScriptVar(void);
 
@@ -236,7 +237,7 @@ public:
     void setString(const std::string &str);
     void setUndefined();
     void setArray();
-    void setPoint(void* p, bool needDestroyed);
+    void setPoint(void* p, JSDestroy destroy, bool needDestroyed);
 
     bool equals(CScriptVar *v);
 
@@ -261,6 +262,10 @@ public:
     void getJSON(std::ostringstream &destination, const std::string linePrefix=""); ///< Write out all the JS code needed to recreate this script variable to the stream (as JSON)
     void setCallback(JSCallback callback, void *userdata); ///< Set the callback for native functions
 
+    void setNativeConstructor(JSCallback callback, void *userdata); ///< Set the callback for native constructor, added by Misa.Z
+	
+    void nativeConstructor(); 
+
     CScriptVarLink *firstChild;
     CScriptVarLink *lastChild;
 
@@ -272,6 +277,7 @@ protected:
     int refs; ///< The number of references held to this - used for garbage collection
 
     void *pData; //added by Misa.Z for point type data
+	JSDestroy destroyFunc;
 	bool needDestroyed; 
 
     std::string data; ///< The contents of this variable if it is a string
@@ -280,6 +286,9 @@ protected:
     int flags; ///< the flags determine the type of the variable - int/double/string/etc
     JSCallback jsCallback; ///< Callback for native functions
     void *jsCallbackUserData; ///< user data passed as second argument to native functions
+
+    JSCallback jsNativeConstructor; ///< Callback for native constructor, added by Misa.Z
+    void *jsNativeConstructorUserData; ///< user data passed as second argument to native constructor
 
     void init(); ///< initialisation of data members
 
@@ -334,10 +343,15 @@ public:
     /// Send all variables to stdout
     void trace();
 
+	void addClass(const std::string& name, CScriptVar* cls);
+
+	void removeClasses();
+
     CScriptVar *root;   /// root of symbol table
 private:
     CScriptLex *l;             /// current lexer
     std::vector<CScriptVar*> scopes; /// stack of scopes when parsing
+    std::vector<CScriptVar*> classes; /// stack of scopes when parsing
 #ifdef TINYJS_CALL_STACK
     std::vector<std::string> call_stack; /// Names of places called so we can show when erroring
 #endif
