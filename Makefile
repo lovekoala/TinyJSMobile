@@ -9,5 +9,5 @@ all:
 	g++ ${CFLAG} -o ${TARGET} ${SRCS}
 
 clean:
-	rm -f jsm *.o
+	rm -fr jsm *.o jsm.dSYM
 

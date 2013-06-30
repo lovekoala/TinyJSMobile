@@ -4,15 +4,15 @@
 #include "native/Array/Array.h"
 
 int main(int argc, char** argv) {
-	CTinyJS tinyJS;
+  CTinyJS tinyJS;
 
   JSM::Debug::registerFunctions(&tinyJS);
   JSM::String::registerFunctions(&tinyJS);
   JSM::Array::registerFunctions(&tinyJS);
 
-	tinyJS.execute("var _terminated = 0; function exit() { _terminated = 1; } ");
+  tinyJS.execute("var _terminated = 0; function exit() { _terminated = 1; } ");
 
-	while(tinyJS.evaluate("_terminated") == "0") {
+  while(tinyJS.evaluate("_terminated") == "0") {
     char buffer[2048];
     fgets ( buffer, sizeof(buffer), stdin );
 

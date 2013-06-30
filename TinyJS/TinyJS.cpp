@@ -705,6 +705,9 @@ void CScriptVarLink::setIntName(int n) {
 
 CScriptVar::CScriptVar() {
     refs = 0;
+	pData = NULL;
+	needDestroyed = false;
+
 #if DEBUG_MEMORY
     mark_allocated(this);
 #endif
@@ -756,7 +759,18 @@ CScriptVar::CScriptVar(int val) {
     setInt(val);
 }
 
+CScriptVar::CScriptVar(void* val, bool needDestroyed) {
+    refs = 0;
+#if DEBUG_MEMORY
+    mark_allocated(this);
+#endif
+    init();
+    setPoint(val, needDestroyed);
+}
+
+
 CScriptVar::~CScriptVar(void) {
+    destroy();
 #if DEBUG_MEMORY
     mark_deallocated(this);
 #endif
@@ -973,10 +987,27 @@ const string &CScriptVar::getString() {
     return data;
 }
 
+void* CScriptVar::getPoint() {
+    if(isObject())
+	  return pData;
+
+    return NULL; /* or NaN? */
+}
+
+void CScriptVar::destroy() {
+    if(isObject() && pData != NULL && needDestroyed) {
+	  delete pData;
+	}
+
+	pData = NULL;
+	needDestroyed = false;
+}
+
 void CScriptVar::setInt(int val) {
     flags = (flags&~SCRIPTVAR_VARTYPEMASK) | SCRIPTVAR_INTEGER;
     intData = val;
     doubleData = 0;
+	destroy();
     data = TINYJS_BLANK_DATA;
 }
 
@@ -984,6 +1015,7 @@ void CScriptVar::setDouble(double val) {
     flags = (flags&~SCRIPTVAR_VARTYPEMASK) | SCRIPTVAR_DOUBLE;
     doubleData = val;
     intData = 0;
+	destroy();
     data = TINYJS_BLANK_DATA;
 }
 
@@ -993,6 +1025,7 @@ void CScriptVar::setString(const string &str) {
     data = str;
     intData = 0;
     doubleData = 0;
+	destroy();
 }
 
 void CScriptVar::setUndefined() {
@@ -1001,6 +1034,7 @@ void CScriptVar::setUndefined() {
     data = TINYJS_BLANK_DATA;
     intData = 0;
     doubleData = 0;
+	destroy();
     removeAllChildren();
 }
 
@@ -1010,7 +1044,18 @@ void CScriptVar::setArray() {
     data = TINYJS_BLANK_DATA;
     intData = 0;
     doubleData = 0;
+	destroy();
     removeAllChildren();
+}
+
+void CScriptVar::setPoint(void* val, bool needDestroyed) {
+    flags = (flags&~SCRIPTVAR_VARTYPEMASK) | SCRIPTVAR_OBJECT;
+    doubleData = 0;
+    intData = 0;
+    data = TINYJS_BLANK_DATA;
+	destroy();
+	pData = val;
+	this->needDestroyed = needDestroyed;
 }
 
 bool CScriptVar::equals(CScriptVar *v) {
@@ -1121,6 +1166,11 @@ void CScriptVar::copySimpleData(CScriptVar *val) {
     data = val->data;
     intData = val->intData;
     doubleData = val->doubleData;
+
+    destroy();
+
+    pData = val->pData;
+	needDestroyed = false;
     flags = (flags & ~SCRIPTVAR_VARTYPEMASK) | (val->flags & SCRIPTVAR_VARTYPEMASK);
 }
 

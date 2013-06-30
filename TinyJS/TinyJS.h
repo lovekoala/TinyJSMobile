@@ -203,6 +203,8 @@ public:
     CScriptVar(const std::string &str); ///< Create a string
     CScriptVar(double varData);
     CScriptVar(int val);
+    CScriptVar(void* p, bool needDestroyed);
+
     ~CScriptVar(void);
 
     CScriptVar *getReturnVar(); ///< If this is a function, get the result value (for use by native functions)
@@ -227,11 +229,15 @@ public:
     double getDouble();
     const std::string &getString();
     std::string getParsableString(); ///< get Data as a parsable javascript string
+    void* getPoint();
+
     void setInt(int num);
     void setDouble(double val);
     void setString(const std::string &str);
     void setUndefined();
     void setArray();
+    void setPoint(void* p, bool needDestroyed);
+
     bool equals(CScriptVar *v);
 
     bool isInt() { return (flags&SCRIPTVAR_INTEGER)!=0; }
@@ -265,6 +271,9 @@ public:
 protected:
     int refs; ///< The number of references held to this - used for garbage collection
 
+    void *pData;
+	bool needDestroyed;
+
     std::string data; ///< The contents of this variable if it is a string
     long intData; ///< The contents of this variable if it is an int
     double doubleData; ///< The contents of this variable if it is a double
@@ -277,6 +286,8 @@ protected:
     /** Copy the basic data and flags from the variable given, with no
       * children. Should be used internally only - by copyValue and deepCopy */
     void copySimpleData(CScriptVar *val);
+
+    void destroy();
 
     friend class CTinyJS;
 };
