@@ -1,5 +1,5 @@
 CFLAGS = -wall -g
-SRC = jsm.cpp \
+SRC = android/jni/android/app/Activity.cpp \
       TinyJS/TinyJS.cpp \
       native/String/String.cpp \
       native/Array/Array.cpp
@@ -10,12 +10,12 @@ EXE = jsm
 # DONOT FORGET to add the TOOLCHAIN_PATH/bin to the PATH environment
 CC = arm-linux-androideabi-gcc
 CXX = arm-linux-androideabi-g++ 
-CXXFLAGS = -fexceptions -frtti
+CXXFLAGS = -fexceptions -frtti -I.
 LDCXXFLAGS = -lstdc++ -lsupc++
 all: $(SRC) $(EXE)
 
 $(EXE): $(OBJ)
-	$(CC) -o $@ $^ $(LDCXXFLAGS)
+	$(CC) -o $@ $^ $(LDCXXFLAGS) $(CXXFLAGS)
 
 $.o: %.cpp
 	$(CC) -o $@ -c $< $(CXXFLAGS) 

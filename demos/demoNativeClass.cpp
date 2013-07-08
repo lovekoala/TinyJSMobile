@@ -24,13 +24,11 @@ class MyClass {
     cls->test();
   }
 
-
 public:
   static void registerFunctions(CTinyJS* tinyJS) {
     CScriptVar* cls = new CScriptVar(TINYJS_BLANK_DATA, SCRIPTVAR_OBJECT);
     cls->setNativeConstructor(constructor, NULL);
     tinyJS->addClass("MyClass", cls);
-
     tinyJS->addNative("function MyClass.test()", test, 0);
   }
 };
