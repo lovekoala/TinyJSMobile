@@ -7,6 +7,6 @@
 <TextView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:text="Fuck you!!!! It WORKSSSSSS!!!!! I AM STARTED FROM JAVASCRIPT!!!!!!!!"
+    android:text="It WORKS. I AM STARTED FROM JAVASCRIPT!"
     android:textSize="18sp" />
 </LinearLayout>
